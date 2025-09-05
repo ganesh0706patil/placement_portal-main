@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;;
 import java.util.List;
 
 @Repository
@@ -23,12 +24,10 @@ public interface AIShortlistRepo extends JpaRepository<AIShortlist, Long> {
     List<AIShortlist> findByStudentId(Long studentId);
 
     // Find by job ordered by rank
-    List<AIShortlist> findByJobOrderByRankAsc(Job job);
     List<AIShortlist> findByJobOrderByScoreDesc(Job job);
 
     // Find top N ranked candidates for a job
-    @Query("SELECT a FROM AIShortlist a WHERE a.job = :job ORDER BY a.rank ASC")
-    List<AIShortlist> findTopByJobOrderByRankAsc(@Param("job") Job job, int limit);
+    Page<AIShortlist> findByJobOrderByRankAsc(Job job, Pageable pageable);
 
     // Find by score range
     List<AIShortlist> findByScoreBetween(Double minScore, Double maxScore);

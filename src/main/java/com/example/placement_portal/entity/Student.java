@@ -3,6 +3,7 @@ package com.example.placement_portal.entity;
 import java.util.List;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Entity
@@ -25,7 +26,7 @@ public class Student {
 
     @Column(nullable = false)
     private String branch;
-    @Column(nullable = false)
+    @Column(name = "\"year\"", nullable = false)
     private Integer year;
     @Column(nullable = false)
     private Double cgpa;

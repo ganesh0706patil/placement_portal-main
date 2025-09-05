@@ -25,7 +25,7 @@ public class AIShortlist {
 
     @Column(nullable = false)
     private Double score;
-    @Column(nullable = false)
+    @Column(nullable = false, name = "student_rank")
     private Integer rank;
 
     @Column(nullable = false)

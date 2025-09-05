@@ -9,8 +9,14 @@ import com.example.placement_portal.repo.AIShortlistRepo;
 import com.example.placement_portal.repo.JobRepo;
 import com.example.placement_portal.repo.ApplicationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -75,12 +81,22 @@ public class AIShortlistServiceImpl implements AIShortlistService {
 
     @Override
     public List<AIShortlist> findByJobOrderByRank(Job job) {
-        return aiShortlistRepo.findByJobOrderByRankAsc(job);
+        // This method should return ALL ranked students for a job.
+        // We can use the Pageable method and ask for a very large page.
+        Pageable unlimited = Pageable.unpaged(); // Or PageRequest.of(0, Integer.MAX_VALUE)
+        return aiShortlistRepo.findByJobOrderByRankAsc(job, unlimited).getContent();
     }
 
     @Override
     public List<AIShortlist> findTopRankedByJob(Job job, int limit) {
-        return aiShortlistRepo.findTopByJobOrderByRankAsc(job, limit);
+        // Create a Pageable object for the first page with 'limit' number of results.
+        Pageable pageable = PageRequest.of(0, limit);
+
+        // Call the new repository method
+        Page<AIShortlist> shortlistPage = aiShortlistRepo.findByJobOrderByRankAsc(job, pageable);
+
+        // Convert the Page content to a List
+        return shortlistPage.getContent();
     }
 
     @Override
