@@ -16,8 +16,8 @@ import java.util.Map;
 public class JwtTokenProvider {
 
 //    @Value("${app.jwt-secret}")
-    private String jwtSecret = "bXktc3VwZXItc2VjdXJlLWtleS1mb3ItcGxhY2VtZW50LXBvcnRhbC1qd3QtMjAyNSE=";
-
+    @Value("${app.jwt-secret}")
+    private String jwtSecret;
     @Value("${app.jwt-expiration-milliseconds:86400000}")
     private long jwtExpirationDate;
 

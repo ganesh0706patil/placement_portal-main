@@ -5,6 +5,7 @@ import com.example.placement_portal.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class CompanyController {
     private CompanyService companyService;
 
     @PostMapping("/save")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Company> saveCompany(@RequestBody Company company) {
         try {
             Company savedCompany = companyService.saveCompany(company);
@@ -29,6 +31,7 @@ public class CompanyController {
     }
 
     @PutMapping("/update")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('COMPANY') and @companyServiceImpl.getCompanyRepository().findById(#company.id).get().getHrEmail() == authentication.principal.username)")
     public ResponseEntity<Company> updateCompany(@RequestBody Company company) {
         try {
             Company updatedCompany = companyService.updateCompany(company);
@@ -39,6 +42,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Company> getCompanyById(@PathVariable Long id) {
         Optional<Company> companyOpt = companyService.findById(id);
         if (companyOpt.isPresent()) {
@@ -48,6 +52,7 @@ public class CompanyController {
     }
 
     @GetMapping("/name/{name}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Company> getCompanyByName(@PathVariable String name) {
         Optional<Company> companyOpt = companyService.findByName(name);
         if (companyOpt.isPresent()) {
@@ -57,6 +62,7 @@ public class CompanyController {
     }
 
     @GetMapping("/hr-email/{hrEmail}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Company> getCompanyByHrEmail(@PathVariable String hrEmail) {
         Optional<Company> companyOpt = companyService.findByHrEmail(hrEmail);
         if (companyOpt.isPresent()) {
@@ -66,6 +72,7 @@ public class CompanyController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Company>> getAllCompanies() {
         try {
             List<Company> companies = companyService.findAllCompanies();
@@ -76,6 +83,7 @@ public class CompanyController {
     }
 
     @GetMapping("/industry/{industry}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Company>> getCompaniesByIndustry(@PathVariable String industry) {
         try {
             List<Company> companies = companyService.findByIndustry(industry);
@@ -86,6 +94,7 @@ public class CompanyController {
     }
 
     @GetMapping("/search/{name}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Company>> searchCompaniesByName(@PathVariable String name) {
         try {
             List<Company> companies = companyService.searchCompaniesByName(name);
@@ -96,6 +105,7 @@ public class CompanyController {
     }
 
     @GetMapping("/active-jobs")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Company>> getCompaniesWithActiveJobs() {
         try {
             List<Company> companies = companyService.findCompaniesWithActiveJobs();
@@ -106,6 +116,7 @@ public class CompanyController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCompany(@PathVariable Long id) {
         try {
             companyService.deleteCompany(id);

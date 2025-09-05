@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface StudentService {
     Student saveStudent(Student student);
+    Student createStudentProfile(Student studentDetails, User currentUser);
+    Student updateStudentProfile(Long studentId, Student updatedDetails, User currentUser) throws IllegalAccessException;
     Student updateStudent(Student student);
     Optional<Student> findById(Long id);
     Optional<Student> findByRollNumber(String rollNumber);

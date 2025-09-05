@@ -20,6 +20,19 @@ public class StudentServiceImpl implements StudentService {
     private StudentRepo studentRepo;
 
     @Override
+    public Student createStudentProfile(Student studentDetails, User currentUser) {
+        // HERE is the check. It uses the ID from the user object we got in the controller.
+        if (studentRepo.findByUserId(currentUser.getId()).isPresent()) {
+            // If a profile is found, the process stops and an error is thrown.
+            throw new IllegalStateException("A student profile already exists for this user.");
+        }
+
+        // This code only runs if the check passes
+        studentDetails.setUser(currentUser);
+        return studentRepo.save(studentDetails);
+    }
+
+    @Override
     public Student saveStudent(Student student) {
         return studentRepo.save(student);
     }
@@ -113,6 +126,30 @@ public class StudentServiceImpl implements StudentService {
             return studentRepo.save(student);
         }
         throw new RuntimeException("Student not found with id: " + studentId);
+    }
+
+    @Override
+    public Student updateStudentProfile(Long studentId, Student updatedDetails, User currentUser) throws IllegalAccessException {
+        // Step 1: Fetch the existing student profile from the database using the ID from the URL.
+        Student existingStudent = studentRepo.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student profile not found with id: " + studentId));
+
+        // Step 2: CRITICAL SECURITY CHECK: Verify that the profile belongs to the logged-in user.
+        if (!existingStudent.getUser().getId().equals(currentUser.getId())) {
+            // If the IDs do not match, throw an exception to deny access.
+            throw new IllegalAccessException("You are not authorized to update this profile.");
+        }
+
+        // Step 3: Apply the updates from the JSON payload to the existing record.
+        // This ensures that critical fields like the user link and ID are not changed.
+        existingStudent.setRollNumber(updatedDetails.getRollNumber());
+        existingStudent.setBranch(updatedDetails.getBranch());
+        existingStudent.setYear(updatedDetails.getYear());
+        existingStudent.setCgpa(updatedDetails.getCgpa());
+        existingStudent.setSkills(updatedDetails.getSkills());
+
+        // Step 4: Save the updated profile back to the database.
+        return studentRepo.save(existingStudent);
     }
 
     @Override

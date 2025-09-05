@@ -3,9 +3,11 @@ package com.example.placement_portal.controller;
 import com.example.placement_portal.entity.Application;
 import com.example.placement_portal.entity.ApplicationStatus;
 import com.example.placement_portal.service.ApplicationService;
+import jakarta.persistence.Access;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,6 +61,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/student/{studentId}")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('STUDENT') and #studentId == authentication.principal.id)")
     public ResponseEntity<List<Application>> getApplicationsByStudentId(@PathVariable Long studentId) {
         try {
             List<Application> applications = applicationService.findByStudentId(studentId);
@@ -69,6 +72,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/job/{jobId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY')")
     public ResponseEntity<List<Application>> getApplicationsByJobId(@PathVariable Long jobId) {
         try {
             List<Application> applications = applicationService.findByJobId(jobId);
@@ -172,6 +176,7 @@ public class ApplicationController {
     }
 
     @PostMapping("/apply/{studentId}/{jobId}")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Application> applyForJob(@PathVariable Long studentId, @PathVariable Long jobId) {
         try {
             Application application = applicationService.applyForJob(studentId, jobId);
